@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>QR Code Generator — Free, No Sign-up | By Mahesh Kumar</title>
+<meta name="description" content="Create a QR code from any text or URL, Wi-Fi details, UPI payment or WhatsApp number. Download as PNG in 4 sizes. Free, works in your browser." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#eef1ee;
+    --surface:#ffffff;
+    --surface-2:#f4f6f3;
+    --ink:#131a17;
+    --ink-2:#4b5a53;
+    --ink-3:#7c8a83;
+    --line:#d9dfd9;
+    --accent:#0b6e4f;
+    --accent-strong:#084c37;
+    --accent-soft:#e2f1ea;
+    --warn:#9a5b00;
+    --warn-bg:#fdf3dd;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(19,26,23,.05), 0 12px 32px -16px rgba(19,26,23,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1210;
+      --surface:#161d1a;
+      --surface-2:#1c2521;
+      --ink:#eef3f0;
+      --ink-2:#a9bab1;
+      --ink-3:#7d8f86;
+      --line:#2a352f;
+      --accent:#2fbf8f;
+      --accent-strong:#5ad6ab;
+      --accent-soft:#17352a;
+      --warn:#f0b95a;
+      --warn-bg:#33270f;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.75rem}
+  a{color:var(--accent)}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 64px}
+  /* ---------- header ---------- */
+  header.top{padding:10px 0 22px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+  .kicker-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.04em;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink-2)}
+  .chip.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  h1{font-size:clamp(32px,5.2vw,52px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0 0 10px}
+  h1 .thin{color:var(--accent)}
+  .lede{margin:0;max-width:640px;color:var(--ink-2);font-size:17px}
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:1fr 400px;gap:22px;align-items:start}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card-pad{padding:22px}
+  .card h2{font-size:15px;font-weight:800;letter-spacing:.02em;margin:0 0 4px;text-transform:uppercase}
+  .card .sub{color:var(--ink-2);font-size:14px;margin:0 0 18px}
+  /* ---------- type tabs ---------- */
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+  @media (max-width:520px){.tabs{grid-template-columns:repeat(2,1fr)}}
+  .tab{appearance:none;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:10px;padding:10px 6px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;min-height:52px;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .tab small{font-weight:500;font-size:11.5px;color:var(--ink-3)}
+  .tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .tab[aria-selected="true"] small{color:var(--accent-strong)}
+  .tab:focus-visible,.btn:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  /* ---------- fields ---------- */
+  .pane{display:none}
+  .pane.active{display:block}
+  label.f{display:block;font-size:13.5px;font-weight:700;margin:16px 0 6px}
+  label.f:first-child{margin-top:0}
+  .hint{font-size:12.5px;color:var(--ink-3);font-weight:500;margin-top:4px}
+  input[type="text"],input[type="url"],input[type="tel"],input[type="number"],textarea,select{
+    width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);
+    color:var(--ink);font:inherit;font-size:16px;padding:11px 13px;
+  }
+  textarea{resize:vertical;min-height:88px;font-size:15px}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:520px){.row2{grid-template-columns:1fr}}
+  .count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);text-align:right;margin-top:6px}
+  /* ---------- options ---------- */
+  .opts{margin-top:22px;padding-top:20px;border-top:1px dashed var(--line)}
+  .seg{display:flex;flex-wrap:wrap;gap:8px}
+  .seg button{appearance:none;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink-2);border-radius:999px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;min-height:40px}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .colors{display:flex;gap:18px;flex-wrap:wrap}
+  .color-field{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700}
+  input[type="color"]{width:48px;height:40px;padding:3px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+  .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:600;padding:10px 0;cursor:pointer}
+  .check input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
+  /* ---------- preview ---------- */
+  .preview-card{position:sticky;top:18px}
+  @media (max-width:860px){.preview-card{position:static}}
+  .qr-stage{background:
+      repeating-conic-gradient(#e8ece8 0% 25%, #f7f8f7 0% 50%) 0 0/22px 22px;
+    border:1px solid var(--line);border-radius:12px;padding:26px;display:flex;align-items:center;justify-content:center;min-height:320px}
+  @media (prefers-color-scheme: dark){
+    .qr-stage{background:repeating-conic-gradient(#232b27 0% 25%, #1a211e 0% 50%) 0 0/22px 22px}
+  }
+  .qr-frame{background:#fff;padding:14px;border-radius:8px;box-shadow:0 8px 28px -10px rgba(0,0,0,.35);line-height:0}
+  .qr-frame canvas{width:248px;height:248px;max-width:62vw;max-height:62vw}
+  .qr-empty{color:var(--ink-3);font-size:14px;font-weight:600;text-align:center;line-height:1.5;padding:20px}
+  .payload{margin-top:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .payload .pl-label{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+  .payload .pl-value{font-family:"IBM Plex Mono",monospace;font-size:12.5px;word-break:break-all;color:var(--ink)}
+  .status{font-size:13.5px;font-weight:600;margin-top:12px;min-height:20px}
+  .status.err{color:#b3261e}
+  @media (prefers-color-scheme: dark){.status.err{color:#ff9d94}}
+  .status.ok{color:var(--accent-strong)}
+  .btn{appearance:none;border:0;border-radius:11px;font:inherit;font-weight:800;cursor:pointer;padding:13px 18px;font-size:15.5px;width:100%}
+  .btn-primary{background:var(--accent);color:#fff;margin-top:14px}
+  .btn-primary:hover{background:var(--accent-strong)}
+  @media (prefers-color-scheme: dark){.btn-primary{color:#08130e}}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-ghost{background:var(--surface-2);color:var(--ink);border:1.5px solid var(--line);margin-top:10px}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn-row .btn{margin-top:10px}
+  .fineprint{font-size:12.5px;color:var(--ink-3);margin-top:14px}
+  /* ---------- below fold ---------- */
+  .below{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media (max-width:860px){.below{grid-template-columns:1fr}}
+  .below h3{font-size:19px;font-weight:800;margin:0 0 10px;letter-spacing:-.01em}
+  .below p,.below li{color:var(--ink-2);font-size:15px}
+  .below ul{margin:0;padding-left:20px}
+  .below li{margin-bottom:7px}
+  .steps{counter-reset:step;list-style:none;padding:0;margin:0}
+  .steps li{counter-increment:step;display:flex;gap:12px;margin-bottom:12px;color:var(--ink-2);font-size:15px}
+  .steps li::before{content:counter(step);flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  details{border-top:1px solid var(--line);padding:12px 0}
+  details:first-of-type{border-top:0}
+  summary{font-weight:700;font-size:15px;cursor:pointer;padding:4px 0}
+  details p{margin:8px 0 2px}
+  .warnbox{background:var(--warn-bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--ink);margin-top:16px}
+  .warnbox strong{color:var(--warn)}
+  footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="kicker-row">
+      <span class="chip solid">FREE TOOL</span>
+      <span class="chip">No sign-up</span>
+      <span class="chip">Nothing is uploaded — made in your browser</span>
+    </div>
+    <h1>QR Code <span class="thin">Generator</span></h1>
+    <p class="lede">Type a link or text — or build a Wi-Fi, UPI payment or WhatsApp QR — and download a sharp PNG, ready for a shop counter, menu, poster or wedding card.</p>
+  </header>
+
+  <div class="grid">
+    <!-- ============ CONTROLS ============ -->
+    <section class="card card-pad" aria-label="QR code content">
+      <h2>1 · What should the QR open?</h2>
+      <p class="sub">Pick a type, fill it in. The preview updates as you type.</p>
+
+      <div class="tabs" role="tablist" aria-label="QR type">
+        <button class="tab" role="tab" data-type="text" aria-selected="true">Text / URL<small>link, text, anything</small></button>
+        <button class="tab" role="tab" data-type="upi" aria-selected="false">UPI Payment<small>PhonePe · GPay · Paytm</small></button>
+        <button class="tab" role="tab" data-type="wifi" aria-selected="false">Wi-Fi<small>guests join in one scan</small></button>
+        <button class="tab" role="tab" data-type="whatsapp" aria-selected="false">WhatsApp<small>chat opens directly</small></button>
+      </div>
+
+      <!-- TEXT / URL -->
+      <div class="pane active" id="pane-text">
+        <label class="f" for="f-text">Text or link</label>
+        <textarea id="f-text" class="mono" placeholder="https://your-shop-or-page-link.com&#10;or any text — a name, an address, a note…" autocomplete="off" spellcheck="false">https://</textarea>
+        <div class="count"><span id="text-count">8</span> characters</div>
+        <p class="hint">Tip: shorter text = simpler QR = easier to scan from far away. Use a short link if your URL is very long.</p>
+      </div>
+
+      <!-- UPI -->
+      <div class="pane" id="pane-upi">
+        <label class="f" for="f-upi-id">Your UPI ID (VPA)</label>
+        <input type="text" id="f-upi-id" class="mono" placeholder="yourname@okhdfcbank or 98XXXXXXXX@paytm" autocomplete="off" spellcheck="false" />
+        <div class="row2">
+          <div>
+            <label class="f" for="f-upi-name">Name shown to payer</label>
+            <input type="text" id="f-upi-name" placeholder="e.g. Sharma General Store" autocomplete="off" />
+          </div>
+          <div>
+            <label class="f" for="f-upi-amount">Amount ₹ <span style="color:var(--ink-3);font-weight:500">(optional)</span></label>
+            <input type="number" id="f-upi-amount" min="0" step="0.01" placeholder="Leave blank = payer types it" />
+          </div>
+        </div>
+        <label class="f" for="f-upi-note">Note <span style="color:var(--ink-3);font-weight:500">(optional)</span></label>
+        <input type="text" id="f-upi-note" placeholder="e.g. Bill payment" autocomplete="off" />
+        <p class="hint">Leave the amount blank for a general “pay me” QR for your counter. Fill it for a fixed-price QR (one product, one booking).</p>
+      </div>
+
+      <!-- WIFI -->
+      <div class="pane" id="pane-wifi">
+        <label class="f" for="f-wifi-ssid">Wi-Fi name (SSID)</label>
+        <input type="text" id="f-wifi-ssid" placeholder="e.g. HomeWiFi or Cafe_Guest" autocomplete="off" spellcheck="false" />
+        <div class="row2">
+          <div>
+            <label class="f" for="f-wifi-pass">Password</label>
+            <input type="text" id="f-wifi-pass" class="mono" placeholder="Wi-Fi password" autocomplete="off" spellcheck="false" />
+          </div>
+          <div>
+            <label class="f" for="f-wifi-enc">Security type</label>
+            <select id="f-wifi-enc">
+              <option value="WPA" selected>WPA / WPA2 / WPA3 (most common)</option>
+              <option value="WEP">WEP (old routers)</option>
+              <option value="nopass">No password (open network)</option>
+            </select>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="f-wifi-hidden" /> This is a hidden network (SSID not broadcast)</label>
+        <div class="warnbox"><strong>Careful:</strong> a Wi-Fi QR shows your password to anyone who scans or photographs it. Print it for guests at home — not on a public wall you can't take down.</div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div class="pane" id="pane-whatsapp">
+        <label class="f" for="f-wa-num">WhatsApp number (with country code)</label>
+        <input type="tel" id="f-wa-num" class="mono" placeholder="91 98XXXXXXXX — India is 91" autocomplete="off" spellcheck="false" />
+        <label class="f" for="f-wa-msg">Pre-filled message <span style="color:var(--ink-3);font-weight:500">(optional)</span></label>
+        <input type="text" id="f-wa-msg" placeholder="e.g. Hi! I want to order…" autocomplete="off" />
+        <p class="hint">Scanning opens a chat with you — no need for the customer to save your number first. Good for shops, tutors and delivery businesses.</p>
+      </div>
+
+      <!-- OPTIONS -->
+      <div class="opts">
+        <h2>2 · Size &amp; look</h2>
+        <p class="sub">Size is the downloaded PNG's resolution — bigger is better for printing.</p>
+
+        <label class="f">Download size</label>
+        <div class="seg" id="size-seg" role="group" aria-label="PNG size">
+          <button data-size="256" aria-pressed="false">256 px · screen</button>
+          <button data-size="512" aria-pressed="true">512 px · sharing</button>
+          <button data-size="1024" aria-pressed="false">1024 px · large</button>
+          <button data-size="2048" aria-pressed="false">2048 px · poster</button>
+        </div>
+
+        <div class="row2" style="margin-top:6px">
+          <div>
+            <label class="f">Colours</label>
+            <div class="colors">
+              <span class="color-field"><input type="color" id="c-dark" value="#000000" aria-label="QR code colour" /> Code</span>
+              <span class="color-field"><input type="color" id="c-light" value="#ffffff" aria-label="Background colour" /> Background</span>
+            </div>
+            <p class="hint">Keep strong contrast — dark code on light background scans best. Light-on-dark often fails.</p>
+          </div>
+          <div>
+            <label class="f" for="f-ecc">Error correction</label>
+            <select id="f-ecc">
+              <option value="M" selected>Medium — good balance</option>
+              <option value="L">Low — simplest QR, scans fastest</option>
+              <option value="Q">High — survives scratches / small logo</option>
+              <option value="H">Highest — most damage-proof, densest QR</option>
+            </select>
+            <p class="hint">Higher correction keeps the QR working even if part is dirty or covered, but adds more squares.</p>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="btn-reset-style" type="button" style="width:auto;padding:10px 16px;font-size:13.5px">Reset colours to black on white</button>
+      </div>
+    </section>
+
+    <!-- ============ PREVIEW ============ -->
+    <section class="card card-pad preview-card" aria-label="Preview and download">
+      <h2>3 · Your QR code</h2>
+      <p class="sub">Test it with your phone camera before you print or share it.</p>
+      <div class="qr-stage">
+        <div class="qr-frame" id="qr-frame"><canvas id="qr-canvas" width="248" height="248"></canvas></div>
+        <div class="qr-empty" id="qr-empty" hidden>Type something on the left<br/>and your QR code will appear here.</div>
+      </div>
+      <div class="payload">
+        <div class="pl-label">This QR contains</div>
+        <div class="pl-value" id="payload-value">—</div>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <button class="btn btn-primary" id="btn-download" type="button">⬇ Download PNG · <span id="dl-size">512 × 512</span></button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-svg" type="button">Download SVG</button>
+        <button class="btn btn-ghost" id="btn-copy" type="button">Copy image</button>
+      </div>
+      <p class="fineprint">This is a <strong>static</strong> QR code: the content is baked into the pattern itself, so it never expires and works without internet on our side — but it also can't be edited or tracked after printing. Print a test copy and scan it first.</p>
+    </section>
+  </div>
+
+  <!-- ============ BELOW ============ -->
+  <div class="below">
+    <section class="card card-pad">
+      <h3>How to use it</h3>
+      <ol class="steps">
+        <li><span><strong>Fill in the content</strong> — a link, your UPI ID, Wi-Fi details or WhatsApp number.</span></li>
+        <li><span><strong>Check the preview</strong> and scan it with your own phone camera. It should open exactly what you expect.</span></li>
+        <li><span><strong>Pick a size</strong> — 512 px is fine for WhatsApp and screens; choose 1024 or 2048 px for anything printed.</span></li>
+        <li><span><strong>Download the PNG</strong> and print it or add it to your poster, menu, visiting card or product label.</span></li>
+      </ol>
+      <div class="warnbox"><strong>Printing rule of thumb:</strong> print a payment or shop QR at least 4–5 cm wide, a poster QR much bigger — people scan from a distance. Never shrink a dense QR (long URL + highest error correction) into a tiny space.</div>
+    </section>
+
+    <section class="card card-pad">
+      <h3>Common questions</h3>
+      <details open>
+        <summary>Does this QR code expire?</summary>
+        <p>No. A static QR holds the content inside the black-and-white pattern itself — there is no server and no expiry. It works as long as the thing it points to (your link, UPI ID, Wi-Fi password) stays the same.</p>
+      </details>
+      <details>
+        <summary>Can I change the link after printing?</summary>
+        <p>No — that's the trade-off of a free static QR. If the destination may change later (a menu, a price list), point the QR at a page you control and update that page instead.</p>
+      </details>
+      <details>
+        <summary>Is my data sent anywhere?</summary>
+        <p>No. The QR is generated entirely in your browser; your text, UPI ID and Wi-Fi password never leave your device. Nothing you type here is stored.</p>
+      </details>
+      <details>
+        <summary>Why won't my QR scan?</summary>
+        <p>Usually one of three things: too much text (use a shorter link), too little contrast (go back to black on white), or printed too small for how dense it is. Lower the error correction to Low and try again.</p>
+      </details>
+      <details>
+        <summary>Can I put my logo in the middle?</summary>
+        <p>Not in this tool. If you add a small logo yourself in an image editor, use High or Highest error correction and test-scan afterwards — the covered centre is exactly what error correction repairs.</p>
+      </details>
+    </section>
+  </div>
+
+  <footer>
+    <span>QR Code Generator — free tool by Good Morning Kids</span>
+    <span>Static QR codes · PNG &amp; SVG · No sign-up, no watermark</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var state = { type:"text", size:512 };
+  var $ = function(id){ return document.getElementById(id); };
+  var canvas = $("qr-canvas"), frame = $("qr-frame"), emptyEl = $("qr-empty"),
+      statusEl = $("status"), payloadEl = $("payload-value"),
+      dlBtn = $("btn-download");
+
+  function escWifi(s){ return String(s).replace(/([\\;,:"'])/g, "\\$1"); }
+
+  function buildPayload(){
+    if(state.type === "text"){
+      return $("f-text").value.trim();
+    }
+    if(state.type === "upi"){
+      var id = $("f-upi-id").value.trim();
+      if(!id) return "";
+      var q = ["pa=" + encodeURIComponent(id)];
+      var name = $("f-upi-name").value.trim();
+      if(name) q.push("pn=" + encodeURIComponent(name));
+      var amt = $("f-upi-amount").value.trim();
+      if(amt) q.push("am=" + encodeURIComponent(amt));
+      q.push("cu=INR");
+      var note = $("f-upi-note").value.trim();
+      if(note) q.push("tn=" + encodeURIComponent(note));
+      return "upi://pay?" + q.join("&");
+    }
+    if(state.type === "wifi"){
+      var ssid = $("f-wifi-ssid").value;
+      if(!ssid.trim()) return "";
+      var enc = $("f-wifi-enc").value;
+      var s = "WIFI:T:" + enc + ";S:" + escWifi(ssid) + ";";
+      if(enc !== "nopass") s += "P:" + escWifi($("f-wifi-pass").value) + ";";
+      if($("f-wifi-hidden").checked) s += "H:true;";
+      return s + ";";
+    }
+    if(state.type === "whatsapp"){
+      var num = $("f-wa-num").value.replace(/[^\d]/g, "");
+      if(!num) return "";
+      var url = "https://wa.me/" + num;
+      var msg = $("f-wa-msg").value.trim();
+      if(msg) url += "?text=" + encodeURIComponent(msg);
+      return url;
+    }
+    return "";
+  }
+
+  function validate(payload){
+    if(!payload) return "";
+    if(state.type === "upi"){
+      var id = $("f-upi-id").value.trim();
+      if(id.indexOf("@") === -1) return "That UPI ID has no “@” — check it, e.g. name@okhdfcbank.";
+      var amt = $("f-upi-amount").value.trim();
+      if(amt && (isNaN(parseFloat(amt)) || parseFloat(amt) <= 0)) return "Amount must be a number bigger than 0.";
+    }
+    if(state.type === "whatsapp"){
+      var n = $("f-wa-num").value.replace(/[^\d]/g, "");
+      if(n.length < 10) return "Number looks too short — include the country code (91 for India).";
+    }
+    return "";
+  }
+
+  var MARGIN = 2; // quiet-zone modules around the code
+
+  function makeQR(payload){
+    var qr = qrcode(0, $("f-ecc").value); // type 0 = auto-fit
+    qr.addData(payload, "Byte");
+    qr.make();
+    return qr;
+  }
+
+  function drawQR(target, qr, pixelSize){
+    var count = qr.getModuleCount();
+    var total = count + MARGIN * 2;
+    target.width = pixelSize; target.height = pixelSize;
+    var ctx = target.getContext("2d");
+    ctx.fillStyle = $("c-light").value;
+    ctx.fillRect(0, 0, pixelSize, pixelSize);
+    ctx.fillStyle = $("c-dark").value;
+    var cell = pixelSize / total;
+    for(var r = 0; r < count; r++){
+      for(var c = 0; c < count; c++){
+        if(qr.isDark(r, c)){
+          ctx.fillRect(Math.round((c + MARGIN) * cell), Math.round((r + MARGIN) * cell),
+                       Math.ceil(cell), Math.ceil(cell));
+        }
+      }
+    }
+  }
+
+  function buildSVG(qr){
+    var count = qr.getModuleCount();
+    var total = count + MARGIN * 2;
+    var path = "";
+    for(var r = 0; r < count; r++){
+      for(var c = 0; c < count; c++){
+        if(qr.isDark(r, c)) path += "M" + (c + MARGIN) + "," + (r + MARGIN) + "h1v1h-1z";
+      }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + total + " " + total + '">' +
+      '<rect width="100%" height="100%" fill="' + $("c-light").value + '"/>' +
+      '<path d="' + path + '" fill="' + $("c-dark").value + '"/></svg>';
+  }
+
+  var lastKey = "";
+  function render(){
+    var payload = buildPayload();
+    var warn = validate(payload);
+    $("text-count").textContent = $("f-text").value.length;
+
+    if(typeof qrcode !== "function"){
+      statusEl.textContent = "⚠ The QR library didn't load — check your internet connection and reload the page.";
+      statusEl.className = "status err";
+      dlBtn.disabled = true;
+      return;
+    }
+    if(!payload){
+      frame.style.display = "none"; emptyEl.hidden = false;
+      payloadEl.textContent = "—";
+      statusEl.textContent = ""; statusEl.className = "status";
+      dlBtn.disabled = true;
+      lastKey = ""; return;
+    }
+    frame.style.display = ""; emptyEl.hidden = true;
+    payloadEl.textContent = payload.length > 220 ? payload.slice(0,220) + "…" : payload;
+
+    var key = payload + "|" + $("f-ecc").value + "|" + $("c-dark").value + "|" + $("c-light").value;
+    if(key === lastKey){
+      if(warn){ statusEl.textContent = "⚠ " + warn; statusEl.className = "status err"; }
+      return;
+    }
+    lastKey = key;
+
+    try {
+      drawQR(canvas, makeQR(payload), 496);
+      dlBtn.disabled = false;
+      if(warn){ statusEl.textContent = "⚠ " + warn; statusEl.className = "status err"; }
+      else {
+        statusEl.textContent = "✓ Ready — scan the preview with your phone to test it.";
+        statusEl.className = "status ok";
+      }
+    } catch(e){
+      statusEl.textContent = "⚠ Too much content for one QR code — shorten the text and try again.";
+      statusEl.className = "status err";
+      dlBtn.disabled = true;
+    }
+  }
+
+  var debounce;
+  function schedule(){ clearTimeout(debounce); debounce = setTimeout(render, 120); }
+
+  // tabs
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(tab){
+    tab.addEventListener("click", function(){
+      tabs.forEach(function(t){ t.setAttribute("aria-selected","false"); });
+      tab.setAttribute("aria-selected","true");
+      state.type = tab.getAttribute("data-type");
+      document.querySelectorAll(".pane").forEach(function(p){ p.classList.remove("active"); });
+      $("pane-" + state.type).classList.add("active");
+      lastKey = ""; render();
+    });
+  });
+
+  // inputs
+  ["f-text","f-upi-id","f-upi-name","f-upi-amount","f-upi-note",
+   "f-wifi-ssid","f-wifi-pass","f-wa-num","f-wa-msg"].forEach(function(id){
+    $(id).addEventListener("input", schedule);
+  });
+  ["f-wifi-enc","f-ecc"].forEach(function(id){ $(id).addEventListener("change", render); });
+  $("f-wifi-hidden").addEventListener("change", render);
+  ["c-dark","c-light"].forEach(function(id){ $(id).addEventListener("input", schedule); });
+
+  // size segmented control
+  $("size-seg").querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click", function(){
+      $("size-seg").querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed","false"); });
+      b.setAttribute("aria-pressed","true");
+      state.size = parseInt(b.getAttribute("data-size"), 10);
+      $("dl-size").textContent = state.size + " × " + state.size;
+    });
+  });
+
+  $("btn-reset-style").addEventListener("click", function(){
+    $("c-dark").value = "#000000"; $("c-light").value = "#ffffff"; render();
+  });
+
+  function downloadURI(uri, filename){
+    var a = document.createElement("a");
+    a.href = uri; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  dlBtn.addEventListener("click", function(){
+    var payload = buildPayload(); if(!payload) return;
+    try {
+      var tmp = document.createElement("canvas");
+      drawQR(tmp, makeQR(payload), state.size);
+      downloadURI(tmp.toDataURL("image/png"), "qr-code-" + state.size + "px.png");
+      statusEl.textContent = "✓ PNG downloaded (" + state.size + " × " + state.size + "). Print a test copy and scan it before wide use.";
+      statusEl.className = "status ok";
+    } catch(e){
+      statusEl.textContent = "⚠ Could not generate the PNG — shorten the text and try again.";
+      statusEl.className = "status err";
+    }
+  });
+
+  $("btn-svg").addEventListener("click", function(){
+    var payload = buildPayload(); if(!payload) return;
+    try {
+      var blob = new Blob([buildSVG(makeQR(payload))], { type: "image/svg+xml" });
+      var url = URL.createObjectURL(blob);
+      downloadURI(url, "qr-code.svg");
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      statusEl.textContent = "✓ SVG downloaded — it scales to any print size without losing sharpness.";
+      statusEl.className = "status ok";
+    } catch(e){
+      statusEl.textContent = "⚠ Could not generate the SVG — shorten the text and try again.";
+      statusEl.className = "status err";
+    }
+  });
+
+  $("btn-copy").addEventListener("click", function(){
+    var payload = buildPayload(); if(!payload) return;
+    if(!window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write){
+      statusEl.textContent = "Copying images isn't supported in this browser — use Download PNG instead.";
+      statusEl.className = "status err"; return;
+    }
+    try {
+      var tmp = document.createElement("canvas");
+      drawQR(tmp, makeQR(payload), 1024);
+      tmp.toBlob(function(blob){
+        var item = {}; item[blob.type] = blob;
+        navigator.clipboard.write([new ClipboardItem(item)]).then(function(){
+          statusEl.textContent = "✓ QR image copied — paste it into your document, poster or chat.";
+          statusEl.className = "status ok";
+        }).catch(function(){
+          statusEl.textContent = "Copy was blocked by the browser — use Download PNG instead.";
+          statusEl.className = "status err";
+        });
+      }, "image/png");
+    } catch(e){
+      statusEl.textContent = "⚠ Could not copy — use Download PNG instead.";
+      statusEl.className = "status err";
+    }
+  });
+
+  render();
+})();
+</script>
+<!-- Gmail signup — Good Morning Kids email list (email-link verified) -->
+<section id="gmk-email-signup" style="max-width:640px;margin:28px auto 0;padding:20px 16px;text-align:center;border-top:2px dashed #f0c040;">
+<h3 style="margin:0 0 6px;font-size:18px;">Apna Gmail daalo — verify karo, naye free tools aur updates ki khabar pao</h3>
+<p style="margin:0 0 12px;color:#666;font-size:14px;">Hum aapke Gmail par ek verification link bhejenge. Link par click karte hi aapka email save ho jayega. Koi spam nahi.</p>
+<form id="gmkEmailForm" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+<input id="gmkEmailInput" type="email" required placeholder="aapka@gmail.com" style="flex:1;min-width:220px;max-width:320px;padding:10px 12px;font-size:15px;border:1px solid #ccc;border-radius:8px;" />
+<button type="submit" style="padding:10px 18px;font-size:15px;background:#f59e0b;color:#fff;border:none;border-radius:8px;cursor:pointer;">Verification Link Bhejo</button>
+</form>
+<p id="gmkEmailMsg" style="margin:10px 0 0;font-size:14px;min-height:20px;"></p>
+</section>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+var TOOL_NAME = "qr-code-generator";
+var TOOL_URL = "https://abcd842323-spec.github.io/qr-code-generator/";
+var form = document.getElementById("gmkEmailForm");
+var input = document.getElementById("gmkEmailInput");
+var msg = document.getElementById("gmkEmailMsg");
+var fbDb = null;
+function show(color, text){ msg.style.color = color; msg.textContent = text; }
+function initFb(){
+if (typeof firebase === "undefined") return false;
+if (!firebase.apps || !firebase.apps.length) {
+firebase.initializeApp({apiKey:"AIzaSyBwPT-AfPvxH3AbEJ8IMPDVFwieZfvv-yg",authDomain:"good-morning-kids-17b08.firebaseapp.com",projectId:"good-morning-kids-17b08",storageBucket:"good-morning-kids-17b08.firebasestorage.app",messagingSenderId:"805083378699",appId:"1:805083378699:web:a904d43f2cd2933aedc30e"});
+}
+fbDb = firebase.firestore();
+return true;
+}
+function handleEmailLink(){
+if (typeof firebase === "undefined") return;
+if (!firebase.auth().isSignInWithEmailLink(window.location.href)) return;
+var email = window.localStorage.getItem("gmkEmailForSignIn");
+if (!email) {
+email = window.prompt("Verification ke liye apna Gmail dobara daalo:");
+if (!email) return;
+}
+if (!initFb()) { show("#c00", "Verify nahi ho paya — internet check karke dobara try karo."); return; }
+firebase.auth().signInWithEmailLink(email, window.location.href).then(function(){
+window.localStorage.removeItem("gmkEmailForSignIn");
+return fbDb.collection("toolEmails").add({email: email.trim().toLowerCase(), tool: TOOL_NAME, verified: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+}).then(function(){
+show("green", "Gmail verify ho gaya, dhanyavaad! \u2713");
+if (form) form.querySelector("button").disabled = true;
+}).catch(function(){
+show("#c00", "Verification link kaam nahi kar raha — naya link mangne ke liye dobara Gmail daalo.");
+});
+}
+form.addEventListener("submit", function(e){
+e.preventDefault();
+var email = input.value.trim().toLowerCase();
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { show("#c00", "Sahi Gmail daalo — jaise aapka@gmail.com"); return; }
+show("#666", "Verification link bhej rahe hain…");
+if (!initFb()) { show("#c00", "Abhi link nahi bhej paye — internet check karke dobara try karo."); return; }
+var actionCodeSettings = { url: TOOL_URL, handleCodeInApp: true };
+firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings).then(function(){
+window.localStorage.setItem("gmkEmailForSignIn", email);
+show("green", "Verification link bhej diya! Apne Gmail me link kholo aur verify karo — tabhi aapka email save hoga.");
+form.querySelector("button").disabled = true;
+}).catch(function(){
+show("#c00", "Link nahi bhej paye — dobara try karo.");
+});
+});
+if (document.readyState === "loading") {
+document.addEventListener("DOMContentLoaded", handleEmailLink);
+} else {
+handleEmailLink();
+}
+})();
+</script>
+
+
+<div style="text-align:center;padding:18px 12px 28px;color:#666;font-size:14px;">By Mahesh Kumar</div>
+
+<!-- Adsterra ads (GitHub Pages site 6231775) -->
+<script async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/f2aab14137246b166ffab0c2f48eb225"></script>
+<div id="container-f2aab14137246b166ffab0c2f48eb225"></div>
+<script data-cfasync="false" src="https://bauval.org/14/b26c99f8ab4002c619dc2e982f8e61aa"></script>
+</body>
+</html>
